@@ -1,0 +1,5 @@
+attention mechanisms in llms
+weight matrices as memory
+attention is focused and becomes weighted into the matrices over time
+differences between attention mech vs weight matrices in rnns/llms
+idk? :/

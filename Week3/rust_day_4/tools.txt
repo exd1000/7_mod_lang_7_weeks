@@ -1,0 +1,3 @@
+VS Code is a Editor.
+Python is a Language.
+Notion is a Notes.
