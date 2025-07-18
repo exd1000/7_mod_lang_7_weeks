@@ -1,0 +1,14 @@
+{
+  "name": "week4",
+  "version": "1.0.0",
+  "main": "day2.ts",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.4.0"
+  }
+}
