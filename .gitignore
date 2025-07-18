@@ -2,3 +2,5 @@
 __pycache__/
 *.ipynb_checkpoints/
 Week3/rust_day_4/target/
+**/node_modules/
+**/.vscode/
