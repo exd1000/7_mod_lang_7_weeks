@@ -61,6 +61,12 @@ check_value(0)      # → Message
 # check_value(150)   → Error and stop
 
 
+# Exercise 3: Logging with message() and warning()
+# Modify the validate_input() function to:
+# 	•	Use message() if x contains any NAs
+# 	•	Use warning() if x contains negative numbers
+
+
 validate_input <- function(x) {
   if (!is.numeric(x)) {
     stop("Input must be numeric!")  # halts execution
@@ -117,6 +123,7 @@ test_that("adding NA returns NA", {
 
 
 
+
 safe_divide <- function(a, b) {
   tryCatch({
     a / b
@@ -125,6 +132,11 @@ safe_divide <- function(a, b) {
   })
 }
 
+# Exercise 4: Unit Testing
+# Use the testthat package to write 3 unit tests for your safe_divide() function:
+# 	•	Dividing 10 by 2 returns 5
+# 	•	Dividing by 0 returns NA
+# 	•	Negative division works correctly
 # Tests
 test_that("safe_divide works", {
   expect_equal(safe_divide(10, 2), 5)
@@ -133,7 +145,13 @@ test_that("safe_divide works", {
 })
 
 
+
+
 # Debugging with browser() and traceback()
+
+# Write a broken function called compute_mean(df, colname) that crashes if the column doesn’t exist.
+# Use tryCatch() and browser() inside it so that you can debug it interactively when it fails.
+
 compute_mean <- function(df, colname) {
   tryCatch({
     browser()  # Pauses execution here
@@ -235,37 +253,3 @@ test_that("square of 0", {
 test_that("square with NA returns NA", {
   expect_true(is.na(square(NA)))
 })
-
-
-
-# Exercise 1: Basic Error Handling
-# Write a function safe_divide(a, b) that returns a / b, but catches division-by-zero errors and returns NA.
-
-
-
-
-# Exercise 2: Custom Error Messages
-# Create a function validate_input(x) that stops execution if x is not a numeric vector, with a clear error message.
-
-
-
-# Exercise 3: Logging with message() and warning()
-# Modify the validate_input() function to:
-# 	•	Use message() if x contains any NAs
-# 	•	Use warning() if x contains negative numbers
-
-
-
-# Exercise 4: Unit Testing
-# Use the testthat package to write 3 unit tests for your safe_divide() function:
-# 	•	Dividing 10 by 2 returns 5
-# 	•	Dividing by 0 returns NA
-# 	•	Negative division works correctly
-
-
-
-# Exercise 5: Debugging
-# Write a broken function called compute_mean(df, colname) that crashes if the column doesn’t exist.
-# Use tryCatch() and browser() inside it so that you can debug it interactively when it fails.
-
-

@@ -2,11 +2,11 @@
 
 temp = 32 
 if temp > 30
-    println('Hot')
+    println("Hot")
 elseif temp >= 15
-    println('Warm')
+    println("Warm")
 else 
-    println('Cold')
+    println("Cold")
 end
 
 
@@ -120,7 +120,7 @@ test_results = Dict(
     "Diana" => 33
     )
 
-for name, score in pairs(test_results)
+for (name, score) in pairs(test_results)
     if score >= 90
         println("$name: Top-tier")
     elseif score >= 75
