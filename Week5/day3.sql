@@ -162,19 +162,87 @@ CREATE TABLE purchases (
 
 -- Exercise 1 – Filter + Transform
 -- Write a query to list all users from the US over age 30, showing their name and age.
+SELECT name, age
+FROM users
+WHERE age > 30 AND country = 'US';
 
 -- Exercise 2 – Grouping & Aggregation
 -- For each country, show:
 -- 	•	total number of users
 -- 	•	average age
 
+SELECT 
+  country, 
+  COUNT(*) as total_users,
+  AVG(age) as avg_age
+FROM users
+GROUP BY country;
+
+
+
 -- Exercise 3 – CTE Composition
--- Write a CTE that finds all users who made purchases over $100 total. Return their name, total amount spent, and number of purchases.
+-- Write a CTE that finds all users who made purchases over $100 total. 
+-- Return their name, total amount spent, and number of purchases.
+WITH user_spending AS (
+  SELECT
+    u.id AS user_id,
+    u.name,
+    SUM(p.amount) AS total_spent,
+    COUNT(p.id) AS purchase_count
+  FROM users u 
+  JOIN purchases p on u.id = p.user_id
+  GROUP BY u.id, u.name
+)
+
+SELECT
+  name,
+  total_spent,
+  purchase_count
+FROM user_spending
+WHERE total_spent > 100;
 
 -- Exercise 4 – Subquery Logic
 -- List all users who made more than 3 purchases, using a subquery to count purchases per user.
+SELECT name
+FROM users
+WHERE id IN (
+  SELECT user_id
+  FROM purchases 
+  GROUP BY user_id
+  HAVING COUNT(*) > 3
+);
+
 
 -- Exercise 5 – View-style Nesting
 -- Write a layered query:
 -- 	•	First: a subquery that calculates each user’s lifetime spend
 -- 	•	Second: selects users whose lifetime spend is in the top 5
+SELECT name, total_spent
+FROM (
+  SELECT 
+    u.name,
+    SUM(p.amount) AS total_spent
+  FROM users u
+  JOIN purchases p ON u.id = p.user_id
+  GROUP BY u.name
+  ORDER BY total_spent DESC
+  LIMIT 5
+) AS top_spenders;
+
+-- You can turn that inner subquery into a view or wrap it as a CTE too.
+-- The ORDER BY ... LIMIT clause must be outside the subquery in some SQL 
+-- engines unless wrapped in a CTE or view.
+-- To ensure universal compatibility:
+-- Recommended rewrite:
+-- WITH lifetime_spend AS (
+--   SELECT 
+--     u.name,
+--     SUM(p.amount) AS total_spent
+--   FROM users u
+--   JOIN purchases p ON u.id = p.user_id
+--   GROUP BY u.name
+-- )
+-- SELECT name, total_spent
+-- FROM lifetime_spend
+-- ORDER BY total_spent DESC
+-- LIMIT 5;
