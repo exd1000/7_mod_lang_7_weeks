@@ -11,6 +11,8 @@
 // No classes. No inheritance. No this. No keywords like extends.
 // But Go supports everything needed for encapsulation, polymorphism, and abstraction with no magic.
 
+// Run code: go run main.go
+
 // Examples
 package main
 
@@ -82,45 +84,123 @@ func examples() {
 
 // EXERCISES
 
-// Exercise 1 – Person Struct
-// Create a Person struct with Name string and Age int.
+// Exercise 1 – Human Struct
+// Create a Human struct with Name string and Age int.
 // Add a method Greet() string that returns "Hi, I'm NAME and I'm AGE years old."
+type Human struct {
+	Name string
+	Age  int
+}
+
+// func (h Human) Greet() string {
+// 	return fmt.Sprintf("Hi I'm %s and I'm %d years old", h.Name, h.Age)
+// }
 
 // Exercise 2 – Constructor
-// Write a constructor function NewPerson(name string, age int) Person that returns a new Person.
+// Write a constructor function NewHuman(name string, age int) Human that returns a new Human.
+func NewHuman(name string, age int) *Human {
+	return &Human{Name: name, Age: age}
+}
 
 // Exercise 3 – Interface Implementation
 // Define a Greetable interface with Greet() string.
-// Implement it for Person, Robot, and Alien.
+// Implement it for Human, Robot, and Alien.
+type Greetable interface {
+	Greet() string
+}
+
+func (h Human) Greet() string {
+	return fmt.Sprintf("Hi I'm %s and I'm %d years old", h.Name, h.Age)
+}
+
+type Robot1 struct {
+	Name string
+}
+
+func (r Robot1) Greet() string {
+	return fmt.Sprintf("I am %s", r.Name)
+}
+
+type Alien struct {
+	Name     string
+	Location string
+}
+
+func (a Alien) Greet() string {
+	return fmt.Sprintf("I'm an %s from %s", a.Name, a.Location)
+}
 
 // Exercise 4 – Encapsulation
 // Create a User struct with:
-// 	•	username string (public)
-// 	•	password string (private)
-// 	•	Method CheckPassword(p string) bool
+//   - username string (public)
+//   - password string (private)
+//   - Method CheckPassword(p string) bool
+//
 // •	Constructor NewUser(username, password string) *User
+type User1 struct {
+	Username string // uppercase = exported (public)
+	password string // lowercase = unexported (private)
+}
+
+func (u *User1) CheckPassword(p string) bool {
+	return u.password == p
+}
+
+func NewUser1(username, password string) *User1 {
+	return &User1{Username: username, password: password}
+}
 
 // Exercise 5 – Polymorphism
-// Write a sayHello(g Greeter) function that takes a Greetable interface and prints the greeting.
-// Use it with Person, Robot, and Alien.
+// Write a sayHi(g Greetable) function that takes a Greetable interface and prints the greeting.
+// Use it with Human, Robot, and Alien.
+func sayHi(g Greetable) {
+	fmt.Println(g.Greet())
+}
+
+// func (h Human) sayHi() string {
+// 	return "Hi I'm " + h.Name
+// }
+
+// func (r Robot1) sayHi() string {
+// 	return "Hi I'm a " + r.Name
+// }
+
+// func (a Alien) sayHi() string {
+// 	return "Hi I'm " + a.Name
+// }
+
+// You could simplify sayHi() methods declared directly on Human, Robot1, and Alien,
+// or remove them if unused (they’re not tied to the interface).
+// Aren’t actually used since you’re calling the sayHi(g Greetable) function instead.
+// ✅ Either remove them (cleaner),
+// 🔁 Or call them directly for contrast:
+// 	fmt.Println(h.sayHi())
 
 // Exercise 6 – Composition
 // Create an Admin struct that embeds User and adds Level (int).
 // Make it so you can still access CheckPassword() via Admin.
+type Admin1 struct {
+	User1
+	Level int
+}
 
 func exercises() {
-	p := NewPerson("Em", 27)
+	h := Human{"Em", 27}
 	r := Robot{ID: "XJ9"}
-	a := Alien{Name: "Zorg"}
+	a := Alien{Name: "Zorg", Location: "Space"}
 
-	sayHello(p)
-	sayHello(r)
-	sayHello(a)
+	// optionally can use constructor for PARENTHESES
+	// instead of structs for BRACKETS:
+	// h := NewHuman("Em", 27)
 
-	u := NewUser("em", "secret")
-	fmt.Println("Password match?", u.CheckPassword("wrong"))
+	sayHi(h)
+	sayHi(r)
+	sayHi(a)
 
-	admin := Admin{User: *u, Level: 5}
+	u := NewUser1("em", "secret")
+	fmt.Println("Password match?", u.CheckPassword("hi"))
+
+	admin := Admin1{User1: *u, Level: 5}
 	fmt.Println("Admin username:", admin.Username)
 	fmt.Println("Password correct?", admin.CheckPassword("secret"))
 }
