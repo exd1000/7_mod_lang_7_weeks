@@ -41,18 +41,18 @@ filter(x -> x > 1, [1, 2, 3])  # [2, 3]
 
 
 # Function Composition (∘)
-f(x) = x + 1
+f1(x) = x + 1
 g(x) = x * 2
-h = f ∘ g  # h(x) = f(g(x))
+h = f1 ∘ g  # h(x) = f(g(x))
 h(3)  # 7
 
-double(x) = 2x
+# double(x) = 2x
 square(x) = x^2
 composed = square ∘ double
 composed(3)  # (2*3)^2 = 36
 
 add1(x) = x + 1
-double(x) = x * 2
+# double(x) = x * 2
 f = double ∘ add1
 f(3)  # (3 + 1) * 2 = 8
 
@@ -89,7 +89,11 @@ double.(1:5)  # [2, 4, 6, 8, 10]
 # Exercise 1 – Function Factory
 # Create a function make_adder(n) that returns a function adding n to input.
 function make_adder(n)
+    return x -> x + n
+end 
 
+make_adder2 = make_adder(2)
+println(make_adder2(3))
 
 # Exercise 2 – Apply Twice
 # Write apply_twice(f, x) that applies a function f to x two times.
@@ -97,18 +101,36 @@ function twice(f, x)
     f(f(x))
 end
 
-twice(x -> x + 1, 3)  # 5
+println(twice(x -> x + 1, 3))  # 5
 
 # Exercise 3 – Anonymous Map
 # Use map(x -> x^2, [1,2,3,4]) to square each number.
-
+println(map(x -> x^2, [1,2,3,4]))
 
 # Exercise 4 – Composition
 # Use ∘ to compose two functions double and square, then test.
-
+r(x) = x + 2
+t(x) = x * 2 
+w = r ∘ t
+println(w(4))
 
 # Exercise 5 – Broadcasting
 # Write a negate(x) function and broadcast it across a vector.
+
+function negate(x)
+    return -x
+end
+
+println(negate.(1:4))  # → [-1, -2, -3, -4]
+
+# 😅 lmao i got this wrong bc i was like wtf do you mean negate 
+# but that was what they meant
+
+    # function negate(x)
+    #     return x * 4 
+    # end 
+
+    # println(negate.(1:4))
 
 
 # Exercise 6 – Chain Operations
@@ -123,4 +145,13 @@ using Statistics
 [1,2,3,4,5,6] |>
     x -> filter(y -> y > 3, x) |>
     x -> map(y -> y^2, x) |>
-    sum  # 77
+    x -> sum(x) |>
+    println # 77
+
+# ✅ Cleaner pipeline
+# println(
+#     [1,2,3,4,5,6] |>
+#         x -> filter(y -> y > 3, x) |>
+#         x -> map(y -> y^2, x) |>
+#         sum
+# )
