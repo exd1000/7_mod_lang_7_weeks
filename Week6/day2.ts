@@ -16,6 +16,11 @@
 // and performance profiling—not traditional multithreading.
 
 
+// Promise-Based Async Flow
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+wait(1000).then(() => console.log('Done waiting!'));
+
 // Async/Await
 async function greet() {
   console.log("Hello");
@@ -67,10 +72,6 @@ async function withLimit(tasks: (() => Promise<any>)[], limit: number) {
   return results;
 }
 
-// Promise-Based Async Flow
-const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-wait(1000).then(() => console.log('Done waiting!'));
 
 
 // Handling Errors in Async
@@ -80,7 +81,7 @@ async function riskyThing() {
 
 try {
   await riskyThing();
-} catch (e) {
+} catch (e:any) {
   console.error("Caught error:", e.message);
 }
 
@@ -147,7 +148,7 @@ async function mightFail() {
 try {
   const res = await mightFail();
   console.log(res);
-} catch (e) {
+} catch (e: any) {
   console.log("Caught:", e.message);
 }
 
@@ -157,6 +158,11 @@ for (let i = 0; i < 5; i++) {
 }
 
 // Profiling Performance
+async function heavyComputation() {
+  await wait(1000); // simulate some delay
+  console.log("Heavy computation done!");
+}
+
 console.time("work");
 
 await heavyComputation();
@@ -168,17 +174,86 @@ console.timeEnd("work");
 
 // Exercise 1 – Async Basics
 // Create an async function that logs “hello”, waits 2 seconds, then logs “bye”.
+async function greeting() {
+  console.log("hi");
+  await wait(2000); 
+  console.log("bye");
+}
+
+greeting();
+
 
 // Exercise 2 – Parallel Tasks
 // Create two tasks taskA and taskB, run them in parallel using Promise.all, 
 // and log the time taken.
+async function tasks(name: string, delay: number) {
+  console.log(`${name} start`);
+  await wait(delay);
+  console.log(`${name} end`);
+}
+
+async function runTasks() {
+  console.time("both");
+  await Promise.all([tasks("A", 2000), tasks("B", 3000)])
+  console.timeEnd("both")
+}
+
+runTasks();
+
+
 
 // Exercise 3 – Sequential vs Parallel
 // Write two long tasks (e.g. 2s and 3s) and compare total runtime when run sequentially vs in parallel.
+async function sequence() {
+  await tasks("A", 2000);
+  await tasks("B", 3000); 
+}
+
+console.time('sequential');
+sequence(); 
+console.timeEnd('sequential');
+
+async function parallels() {
+  await Promise.all([tasks("A", 2000), tasks("B", 3000)]);
+}
+
+console.time('parallels');
+parallels();
+console.timeEnd('parallels');
+
+
+// 🧠 Insight: await pauses. Promise.all() runs concurrently!
+
+// ❗You called both sequence() and parallels() one after the other
+// which means you ran both, but the results overlapped. 
+// whoopsies added console.time
 
 
 // Exercise 4 – Simulated Concurrency Control
 // Limit max concurrent tasks to 2 using the withLimit() pattern above. Use fake tasks with random delays and log start/end times.
+async function withLimits(tasks: (() => Promise<any>)[], limit:number) {
+  const results: any[] = [];
+  let i = 0; 
+
+  const run = async () => {
+    while (i < tasks.length) {
+      const idx = i++;
+      results[idx] = await tasks[idx]();
+    }
+  };
+  await Promise.all(Array.from({length: limit}, () => run()));
+  return results;
+}
+
+const fakeTasks = [
+  () => tasks("A", 2000),
+  () => tasks("B", 3000),
+  () => tasks("C", 1000),
+  () => tasks("D", 4000),
+  () => tasks("E", 1500),
+];
+
+await withLimits(fakeTasks, 2);
 
 
 // Exercise 5 – Event Loop Order
@@ -187,6 +262,9 @@ console.timeEnd("work");
     Promise.resolve().then(() => console.log("promise"));
     console.log("sync");
 // Output? → sync, then promise, then timeout.
+
+// 💡 Microtasks (.then()) run before macrotasks (setTimeout), 
+// even if the timeout is 0ms. That’s JavaScript’s cheeky lil queue 💋
 
 
 // Exercise 6 – Web Worker (Optional for Node)
@@ -197,3 +275,20 @@ console.timeEnd("work");
 // Use console.time to benchmark the difference between:
 // 	•	Array.map().filter().reduce() chaining vs.
 // 	•	classic for loop
+
+console.time("map-filter");
+const result = Array(1e6).fill(1)
+  .map(x => x + 1)
+  .filter(x => x % 2 === 0)
+  .reduce((a, b) => a + b, 0);
+console.timeEnd("map-filter");
+
+console.time("for-loop");
+let sum = 0;
+for (let i = 0; i < 1e6; i++) {
+  const x = i + 1;
+  if (x % 2 === 0) sum += x;
+}
+console.timeEnd("for-loop");
+
+// 💡 You’ll likely see for-loop is faster—less abstraction overhead.
